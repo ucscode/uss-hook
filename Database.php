@@ -27,7 +27,7 @@ class Database
                 title VARCHAR(255) NOT NULL,
                 position VARCHAR(12) NOT NULL DEFAULT 'header',
                 area TEXT NOT NULL,
-                status TINYINT NOT NULL DEFAULT 1,
+                status VARCHAR(10) NOT NULL DEFAULT 'enabled',
                 content TEXT
             )",
             self::TABLE_HOOK

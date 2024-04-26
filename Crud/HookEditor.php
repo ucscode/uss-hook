@@ -6,6 +6,7 @@ use Module\Dashboard\Bundle\Crud\Component\CrudEnum;
 use Module\Dashboard\Bundle\Crud\Service\Editor\CrudEditor;
 use Module\Hook\Database;
 use Ucscode\UssForm\Field\Field;
+use Ucscode\UssForm\Resource\Service\Pedigree\FieldPedigree;
 use Uss\Component\Kernel\Uss;
 
 class HookEditor extends CrudEditor
@@ -14,25 +15,33 @@ class HookEditor extends CrudEditor
     {
         parent::__construct(Database::TABLE_HOOK);
         $this->configure();
-
-        /**
-         * @var \Module\Dashboard\Bundle\Crud\Service\Editor\Compact\CrudEditorForm
-         */
-        $form = $this->getForm()->handleSubmission();
-        
-        if($form->isSubmitted() && $form->isPersisted()) {
-            $base = Uss::instance()->replaceUrlQuery();
-            if($this->getChannel() === CrudEnum::CREATE) {
-                header("location: $base");
-                exit;
-            }
-        }
     }
 
     protected function configure(): void
     {
-        $this->detachField('id');
+        $this->customSubmissionControl();
+        $this->detachField('id');   
         $this->buildFields();
+    }
+
+    protected function customSubmissionControl(): void
+    {
+        $form = $this->getForm();
+        
+        if($form->isSubmitted()) {
+            
+            $_POST['area'] = json_encode($_POST['area']);
+            
+            $form->handleSubmission();
+
+            if($form->isPersisted()) {
+                $base = Uss::instance()->replaceUrlQuery();
+                if($this->getChannel() === CrudEnum::CREATE) {
+                    header("location: $base");
+                    exit;
+                }
+            }
+        }
     }
 
     protected function buildFields(): void
@@ -48,8 +57,8 @@ class HookEditor extends CrudEditor
         $this->configureField('status', [
             'nodeName' => Field::NODE_SELECT,
             'options' => [
-                'Disabled',
-                'Enabled'
+                'disabled' => 'Disabled',
+                'enabled' => 'Enabled'
             ]
         ]);
 
@@ -61,6 +70,39 @@ class HookEditor extends CrudEditor
                 'id' => 'textbox'
             ]
         ]);
+
+        $pedigree = $this->configureField('area', [
+            'nodeName' => Field::NODE_SELECT,
+            'attributes' => [
+                'multiple' => '',
+                'size' => 3,
+                'class' => 'form-select form-select-lg',
+                'name' => 'area[]',
+            ],
+            'options' => [
+                'admin' => 'Admin',
+                'user' => 'User',
+                'frontend' => 'Front End'
+            ]
+        ]);
+
+        $this->updateAreaField($pedigree);
         
+    }
+
+    protected function updateAreaField(FieldPedigree $pedigree): void
+    {
+        if($this->getChannel() === CrudEnum::UPDATE) {
+            $properties = $this->getEntity()->getAll();
+            $area = json_decode($properties['area'] ?? '[]');
+            if(!empty($area)) {
+                foreach($pedigree->widget->getOptions() as $key => $value) {
+                    if(in_array($key, $area)) {
+                        $element = $pedigree->widget->getOptionElement($key);
+                        $element->setAttribute('selected', 'selected');
+                    }
+                }
+            }
+        }
     }
 }
