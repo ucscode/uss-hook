@@ -82,11 +82,16 @@ class HookEditor extends CrudEditor
             'options' => [
                 'admin' => 'Admin',
                 'user' => 'User',
-                'frontend' => 'Front End'
+                'auth' => 'Authentication',
+                'others' => 'Others'
             ]
         ]);
 
         $this->updateAreaField($pedigree);
+
+        $this->configureField('sort', [
+            'nodeType' => Field::TYPE_NUMBER,
+        ]);
         
     }
 

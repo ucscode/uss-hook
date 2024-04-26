@@ -4,6 +4,7 @@ namespace Module\Hook\Crud;
 
 use Module\Dashboard\Bundle\Crud\Service\Inventory\CrudInventory;
 use Module\Hook\Database;
+use Ucscode\DOMTable\Interface\DOMTableIteratorInterface;
 
 class HookInventory extends CrudInventory
 {
@@ -25,5 +26,17 @@ class HookInventory extends CrudInventory
             ->removeColumn('id')
             ->removeColumn('content')
         ;
+
+        $this->addEntityMutationIterator('hook', $this->entityIterator());
+    }
+
+    protected function entityIterator(): DOMTableIteratorInterface
+    {
+        return new class implements DOMTableIteratorInterface {
+            public function foreachItem(array $item): ?array
+            {
+                return $item;
+            }
+        };
     }
 }

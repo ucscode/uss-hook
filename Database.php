@@ -28,7 +28,8 @@ class Database
                 position VARCHAR(12) NOT NULL DEFAULT 'header',
                 area TEXT NOT NULL,
                 status VARCHAR(10) NOT NULL DEFAULT 'enabled',
-                content TEXT
+                content TEXT,
+                sort INT NOT NULL DEFAULT 0
             )",
             self::TABLE_HOOK
         );

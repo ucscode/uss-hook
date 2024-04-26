@@ -1,5 +1,6 @@
 {{ element.html|raw }}
 
+{% if isEditor %}
 <script>
     window.addEventListener('load', function() {
         document.getElementById('textbox').addEventListener('keydown', function(e) {
@@ -19,3 +20,4 @@
         });
     });
 </script>
+{% endif %}

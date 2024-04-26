@@ -11,6 +11,7 @@ new class {
         Uss::instance()->filesystemLoader->addPath(__DIR__ . '/templates', 'Hook');
         new Database();
         new AdminControl();
+        new PlacementControl();
     }
 
 };

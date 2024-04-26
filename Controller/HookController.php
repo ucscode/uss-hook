@@ -15,11 +15,11 @@ class HookController extends AbstractDashboardController
     {
         parent::onload($context);
         
-        $editorRange = [CrudEnum::CREATE->value, CrudEnum::UPDATE->value];
-
         $channel = $_GET['channel'] ?? null;
+        
+        $isEditor = in_array($channel, [CrudEnum::CREATE->value, CrudEnum::UPDATE->value]);
 
-        $crudObject = in_array($channel, $editorRange) ? new HookEditor() : new HookInventory();
+        $crudObject = $isEditor ? new HookEditor() : new HookInventory();
 
         AdminDashboard::instance()->getDocument('hook')->getMenuItem(
             $crudObject->getChannel() === CrudEnum::CREATE ? 'hook.new' : 'hook'
@@ -27,6 +27,7 @@ class HookController extends AbstractDashboardController
 
         $this->document->setContext([
             'element' => $crudObject->build(),
+            'isEditor' => $isEditor,
         ]);
     }
 }
