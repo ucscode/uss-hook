@@ -8,7 +8,9 @@ use Module\Dashboard\Foundation\User\UserDashboard;
 use Ucscode\SQuery\Condition;
 use Ucscode\SQuery\SQuery;
 use Uss\Component\Block\BlockManager;
+use Uss\Component\Event\Event;
 use Uss\Component\Kernel\Uss;
+use Uss\Component\Route\Route;
 
 class PlacementControl
 {
@@ -61,19 +63,17 @@ class PlacementControl
 
     protected function placeSourceCodes(): void
     {
-        foreach($this->hooks as $hook) {
-            foreach($hook['area'] as $area) {
-                if($this->isArea($area)) {
-                    $blockName = ($hook['position'] == 'header') ? 'head_javascript' : 'body_javascript';
-                    BlockManager::instance()->getBlock($blockName)
-                        ->addContent(
-                            sprintf("hook-%s", $hook['id']),
-                            $hook['content']
-                        )
-                    ;
+        Event::instance()->addListener('onload:before', function(Route $route) {
+            foreach($this->hooks as $hook) {
+                foreach($hook['area'] as $area) {
+                    if($this->isArea($area)) {
+                        $blockName = ($hook['position'] == 'header') ? 'head_javascript' : 'body_javascript';
+                        $block = BlockManager::instance()->getBlock($blockName);
+                        $block->addContent(sprintf("hook-%s", $hook['id']), $hook['content']);
+                    }
                 }
             }
-        }
+        }, 100);
     }
 
     private function isAreaAuth(?string $base): bool
